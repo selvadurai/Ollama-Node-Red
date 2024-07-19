@@ -1,6 +1,6 @@
 import http.client
 
-conn = http.client.HTTPConnection("192.168.0.88:1880")
+conn = http.client.HTTPConnection("<IP GOES HERE>")
 
 payload = "{ \n\t\"prompt\":\"Discharge Temp is higher  Discharge temp Set point in hvac AHU. Is the AHU operating correctly? If not what are the possible causes? \" \n}"
 
