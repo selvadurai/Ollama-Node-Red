@@ -6,7 +6,7 @@ payload = "{ \n\t\"prompt\":\"What color is the sky? \" \n}"
 
 headers = { 'Content-Type': "application/json" }
 
-conn.request("POST", "/ollama1", payload, headers)
+conn.request("POST", "/ollama", payload, headers)
 
 res = conn.getresponse()
 data = res.read()
