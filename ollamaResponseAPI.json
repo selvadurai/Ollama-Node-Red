@@ -1,0 +1,152 @@
+[
+    {
+        "id": "e3447ee08503a099",
+        "type": "tab",
+        "label": "OllamaResponseAPI",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "61aee14935ceb9dd",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "Ollama Payload",
+        "func": "const question=msg.payload.prompt;\n\nmsg.headers = {}\nmsg.headers = {\n    'content-type': 'application/json',\n};\n\nmsg.payload = {}\n\n\nmsg.payload = {\n    \"model\": \"tinyllama\",\n    \"prompt\": question\n};\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 120,
+        "wires": [
+            [
+                "c75c2eba634786dd"
+            ]
+        ]
+    },
+    {
+        "id": "c75c2eba634786dd",
+        "type": "http request",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:11434/api/generate ",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 510,
+        "y": 120,
+        "wires": [
+            [
+                "39a77ea5c6f4a1c9"
+            ]
+        ]
+    },
+    {
+        "id": "39a77ea5c6f4a1c9",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "Parse  Response",
+        "func": "const payloadList = msg.payload.toString().split(\"}\");\n\n//Outputs AI Ollamas message\nvar text = \"\";\n\n//Parses through the payloadList json body\nfor (let i = 0; i < payloadList.length; i++) {\n\n    var response = payloadList[i].substring(payloadList[i].search(\"response\"));\n    text += response.substring(response.search(\":\") + 2, response.search(\",\") - 1)\n}\n\ntext = text.replace(/\\\\n/g, \"\\n\");\ntext = text.replace(/\\\"\"/g, \"&quote\");\ntext = text.replace(/\\\"\"/g, \"\\&quot;\");\n\n\n//text output copied to msg.payload\nmsg.payload = text;\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 120,
+        "wires": [
+            [
+                "cbf55a9b6efadd34"
+            ]
+        ]
+    },
+    {
+        "id": "9029e894152d7051",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Ollama Payload",
+        "info": "",
+        "x": 280,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "160e636fb79f33ed",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Sends Payload Body to Ollama API",
+        "info": "",
+        "x": 520,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "61c9e2fd088eb3ec",
+        "type": "http in",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "url": "/ollama",
+        "method": "post",
+        "upload": true,
+        "swaggerDoc": "",
+        "x": 70,
+        "y": 120,
+        "wires": [
+            [
+                "61aee14935ceb9dd"
+            ]
+        ]
+    },
+    {
+        "id": "24bdfcc262222457",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Post API Request",
+        "info": "",
+        "x": 80,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "5a49ab88802b9917",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Parse Ollama Response",
+        "info": "",
+        "x": 750,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "cbf55a9b6efadd34",
+        "type": "http response",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 970,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "a09649ece631a360",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Response",
+        "info": "",
+        "x": 980,
+        "y": 80,
+        "wires": []
+    }
+]
