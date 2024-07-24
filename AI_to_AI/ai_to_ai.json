@@ -1,0 +1,460 @@
+[
+    {
+        "id": "e3447ee08503a099",
+        "type": "tab",
+        "label": "AI_TO_AI",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "39a77ea5c6f4a1c9",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "Parse  Response",
+        "func": "const payloadList = msg.payload.toString().split(\"}\");\n\n\n//Set global variables\nglobal.set(\"bob\",\"\");\n\n\n\n//Outputs AI Ollamas message\nvar text = \"\";\n\n//Parses through the payloadList json body\nfor (let i = 0; i < payloadList.length; i++) {\n\n    var response = payloadList[i].substring(payloadList[i].search(\"response\"));\n    text += response.substring(response.search(\":\") + 2, response.search(\",\") - 1)\n}\n\ntext = text.replace(/\\\\n/g, \"\\n\");\ntext = text.replace(/\\\"\"/g, \"&quote\");\ntext = text.replace(/\\\"\"/g, \"\\&quot;\");\n\nconst jsonPayload = {\n                      \"bob\":\"Say hello to other AI bot and start a converstation\",\n                     //\"bob\": '\"' + text + '\"',\n                      \"alice\": \"no response\",\n                       \"talk\":1\n                    };\n\n\n//text output copied to msg.payload\nmsg.payload = jsonPayload;\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "676658340d6e1723"
+            ]
+        ]
+    },
+    {
+        "id": "9029e894152d7051",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Ollama Payload",
+        "info": "",
+        "x": 280,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "160e636fb79f33ed",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Sends Payload Body to Ollama API",
+        "info": "",
+        "x": 520,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "24bdfcc262222457",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Post API Request",
+        "info": "",
+        "x": 80,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "5a49ab88802b9917",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Parse Ollama Response",
+        "info": "",
+        "x": 430,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "a09649ece631a360",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Response",
+        "info": "",
+        "x": 760,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "7e547fd7ccfaf8a2",
+        "type": "inject",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 70,
+        "y": 120,
+        "wires": [
+            [
+                "39a77ea5c6f4a1c9"
+            ]
+        ]
+    },
+    {
+        "id": "676658340d6e1723",
+        "type": "mqtt out",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "topic": "convo",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "becc16f661278b7f",
+        "x": 750,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "076cb14395a8ba16",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Bob Trigger AI Convo",
+        "info": "",
+        "x": 300,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "f740f7fd7bb18f61",
+        "type": "mqtt in",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "topic": "convo",
+        "qos": "2",
+        "datatype": "utf8",
+        "broker": "becc16f661278b7f",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 50,
+        "y": 360,
+        "wires": [
+            [
+                "020f806f407cad43"
+            ]
+        ]
+    },
+    {
+        "id": "80612a6d351060ba",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "function 1",
+        "func": "const obj = global.get('payload');\n\n\nmsg.headers = {}\nmsg.headers = {\n    'content-type': 'application/json',\n};\n\nif(obj==null){\n    msg.payload = {\n    \"model\": \"tinyllama\",\n    \"prompt\": \"hello\"\n    };\n}\nelse{\n  msg.payload = {\n    \"model\": \"tinyllama\",\n    \"prompt\": \"respond:\"+obj.bob\n  };\n\n}\n\n\nglobal.set('bob', obj.bob);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 260,
+        "wires": [
+            [
+                "b30fb007b87268ae"
+            ]
+        ]
+    },
+    {
+        "id": "ef4605bf616f788a",
+        "type": "debug",
+        "z": "e3447ee08503a099",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "62d5224615927c62",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Alice Responses",
+        "info": "",
+        "x": 500,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "b30fb007b87268ae",
+        "type": "http request",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://192.168.0.212:11434/api/generate ",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 670,
+        "y": 260,
+        "wires": [
+            [
+                "0b638c22522a11e6"
+            ]
+        ]
+    },
+    {
+        "id": "0b638c22522a11e6",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "Parse  Response",
+        "func": "const payloadList = msg.payload.toString().split(\"}\");\n\n//Outputs AI Ollamas message\nvar text = \"\";\n\n//Parses through the payloadList json body\nfor (let i = 0; i < payloadList.length; i++) {\n\n    var response = payloadList[i].substring(payloadList[i].search(\"response\"));\n    text += response.substring(response.search(\":\") + 2, response.search(\",\") - 1)\n}\n\ntext = text.replace(/\\\\n/g, \"\\n\");\ntext = text.replace(/\\\"\"/g, \"&quote\");\ntext = text.replace(/\\\"\"/g, \"\\&quot;\");\n\nvar bob=global.get(\"bob\");\n\nconst jsonPayload = {\n                      \"bob\":bob,\n                      \"alice\":text,\n                      \"talk\":2\n                    };\n\n\n//text output copied to msg.payload\nmsg.payload = jsonPayload;\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 260,
+        "wires": [
+            [
+                "ef4605bf616f788a",
+                "2f8df96b9c4322ad"
+            ]
+        ]
+    },
+    {
+        "id": "2f8df96b9c4322ad",
+        "type": "mqtt out",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "topic": "convo",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "becc16f661278b7f",
+        "x": 1090,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "0822d6075c35421d",
+        "type": "comment",
+        "z": "e3447ee08503a099",
+        "name": "Bob Responses",
+        "info": "",
+        "x": 460,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "291d8d975993130e",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "function 2",
+        "func": "const obj = global.get('payload');\n\n\nmsg.headers = {}\nmsg.headers = {\n    'content-type': 'application/json',\n};\n\nif(obj==null){\n    msg.payload = {\n    \"model\": \"tinyllama\",\n    \"prompt\": \"hello\"\n    };\n}\nelse{\n  msg.payload = {\n    \"model\": \"tinyllama\",\n    \"prompt\": \"respond:\"+obj.alice\n  };\n\n}\n\n\nglobal.set('alice', obj.alice);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 500,
+        "wires": [
+            [
+                "d041d1a8ef4fe74d"
+            ]
+        ]
+    },
+    {
+        "id": "d041d1a8ef4fe74d",
+        "type": "http request",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://192.168.0.212:11434/api/generate ",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 500,
+        "wires": [
+            [
+                "2c216ad15b41ccc4"
+            ]
+        ]
+    },
+    {
+        "id": "2c216ad15b41ccc4",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "Parse  Response",
+        "func": "const payloadList = msg.payload.toString().split(\"}\");\n\n//Outputs AI Ollamas message\nvar text = \"\";\n\n//Parses through the payloadList json body\nfor (let i = 0; i < payloadList.length; i++) {\n\n    var response = payloadList[i].substring(payloadList[i].search(\"response\"));\n    text += response.substring(response.search(\":\") + 2, response.search(\",\") - 1)\n}\n\ntext = text.replace(/\\\\n/g, \"\\n\");\ntext = text.replace(/\\\"\"/g, \"&quote\");\ntext = text.replace(/\\\"\"/g, \"\\&quot;\");\n\nvar alice=global.get(\"alice\");\n\nconst jsonPayload = {\n                      \"bob\":text,\n                      \"alice\": alice,\n                      \"talk\":1\n                    };\n\n\n//text output copied to msg.payload\nmsg.payload = jsonPayload;\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 500,
+        "wires": [
+            [
+                "05604cbc143b863e",
+                "0b1d86d0634f4c64"
+            ]
+        ]
+    },
+    {
+        "id": "0b1d86d0634f4c64",
+        "type": "mqtt out",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "topic": "convo",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "becc16f661278b7f",
+        "x": 1050,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "05604cbc143b863e",
+        "type": "debug",
+        "z": "e3447ee08503a099",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "020f806f407cad43",
+        "type": "function",
+        "z": "e3447ee08503a099",
+        "name": "function 3",
+        "func": "const obj=JSON.parse(msg.payload);\n\nglobal.set('payload',obj);\n\n/*\nif(obj.t.includes(\"respond:\"))\n   msg.payload=1;\nelse \n   msg.payload=2;  \n   */\n\nmsg.payload=obj.talk;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 180,
+        "y": 360,
+        "wires": [
+            [
+                "e9ddd1196767a22f"
+            ]
+        ]
+    },
+    {
+        "id": "e9ddd1196767a22f",
+        "type": "switch",
+        "z": "e3447ee08503a099",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 330,
+        "y": 360,
+        "wires": [
+            [
+                "80612a6d351060ba"
+            ],
+            [
+                "291d8d975993130e"
+            ]
+        ]
+    },
+    {
+        "id": "becc16f661278b7f",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.0.212",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "3",
+        "keepalive": "1000",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
